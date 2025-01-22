@@ -68,7 +68,7 @@ public class MainController {
             List<KieContainerResource> containers = response.getResult().getContainers();
             sb.append("Available Containers:\n");
             for (KieContainerResource containerLis : containers) {
-                sb.append("Container ID: " + containerLis.getContainerId());
+                sb.append("Container ID: " + containerLis.getContainerId()+" \t");
                 sb.append("Release ID: " + containerLis.getReleaseId()+"\n");
             }
         } else {
