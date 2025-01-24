@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,8 +38,15 @@ public class MainService {
         return mainRepository.getTableList();
     }
 
-    public List<String> getTableColumn(String tableName){
-        return mainRepository.getTableColumns(tableName);
+    public List<String> getTableColumn(String[] tableName){
+        List<Object[]> columns= mainRepository.getTableColumns(tableName);
+        List<String> columnList = new ArrayList<>();
+        for (Object[] row : columns) {
+            String table = (String) row[0];
+            String column = (String) row[1];
+            columnList.add(table+"."+column);
+        }
+        return columnList;
     }
 
     public Long saveRule(QueryBuilderDTO queryBuilderDTO){

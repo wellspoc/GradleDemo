@@ -29,7 +29,8 @@ public class MainControll {
 
     @GetMapping("getColumns")
     public ResponseEntity getTableColumns(@RequestParam String tableName) {
-        List<String> data = mainService.getTableColumn(tableName);
+        String[] tableList = tableName.split(",");
+        List<String> data = mainService.getTableColumn(tableList);
         ResponseEntity responseEntity = ResponseEntity.ok(data);
         return responseEntity;
     }

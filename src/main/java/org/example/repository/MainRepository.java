@@ -17,6 +17,6 @@ public interface MainRepository extends JpaRepository<Users, Long> {
     @Query(nativeQuery = true, value = "SELECT table_name FROM information_schema.tables WHERE table_schema = '"+tableSchema+"'")
     List<String> getTableList();
 
-    @Query(nativeQuery = true,value = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = :tableName AND TABLE_SCHEMA = '"+tableSchema+"'")
-    List<String> getTableColumns(@Param("tableName") String tableName);
+    @Query(nativeQuery = true,value = "SELECT TABLE_NAME,COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME IN (:tableName) AND TABLE_SCHEMA = '"+tableSchema+"'")
+    List<Object[]> getTableColumns(@Param("tableName") String[] tableName);
 }
