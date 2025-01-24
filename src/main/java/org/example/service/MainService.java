@@ -11,6 +11,7 @@ import org.example.repository.MainRepository;
 import org.example.repository.RuleDataRepository;
 import org.example.repository.RulesRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,13 +26,15 @@ public class MainService {
     private final MainRepository mainRepository;
     private final RulesRepository rulesRepository;
     private final RuleDataRepository ruleDataRepository;
+    @Value("${spring.tableschema}")
+    String tableSchema = "public";
 
     public List<String> getTables() {
-        return mainRepository.getTableList();
+        return mainRepository.getTableList(tableSchema);
     }
 
     public List<String> getTableColumn(String[] tableName) {
-        return mainRepository.getTableColumns(tableName).stream()
+        return mainRepository.getTableColumns(tableName,tableSchema).stream()
                 .map(row -> row[0] + "." + row[1])
                 .collect(Collectors.toList());
     }
