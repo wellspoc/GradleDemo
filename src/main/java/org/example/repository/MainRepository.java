@@ -16,4 +16,8 @@ public interface MainRepository extends JpaRepository<Users, Long> {
 
     @Query(nativeQuery = true, value = "SELECT table_name, column_name FROM information_schema.columns WHERE table_name IN (:tableName) AND table_schema = :schema")
     List<Object[]> getTableColumns(@Param("tableName") String[] tableName, @Param("schema") String tableSchema);
+
+    @Query(value = ":query LIMIT 10",
+            nativeQuery = true)
+    List<Object[]> getResult( @Param("query") String queryData);
 }

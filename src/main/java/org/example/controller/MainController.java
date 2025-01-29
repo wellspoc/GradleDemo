@@ -116,6 +116,11 @@ public class MainController {
         return ResponseEntity.ok(taskId);
     }
 
+    @PostMapping("/executeQuery")
+    public ResponseEntity<String> executeQuery(@RequestBody String query) throws JsonProcessingException {
+        String tableData= mainService.executeQuery(query);
+        return ResponseEntity.ok(tableData);
+    }
     private static final String KIE_SERVER_URL = "https://jbpm-53jhowy2kq-uc.a.run.app/kie-server/services/rest/server";
     private static final String KIE_SERVER_USER = "wbadmin";
     private static final String KIE_SERVER_PASSWORD = "wbadmin";

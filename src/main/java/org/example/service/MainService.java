@@ -1,5 +1,7 @@
 package org.example.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.example.constant.Status;
 import org.example.dto.QueryBuilderDTO;
@@ -21,6 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +49,9 @@ public class MainService {
 
     @Autowired
     TasksRepository tasksRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Value("${spring.tableschema}")
     String tableSchema = "public";
@@ -175,5 +183,14 @@ public class MainService {
                 }
             }
             return taskDetailsDTO.getTaskId();
+    }
+
+    public String executeQuery(String query) throws JsonProcessingException {
+      // List<Object[]> data = mainRepository.getResult(query);
+        ObjectMapper objectMapper = new ObjectMapper();
+       Query nativeQuery = entityManager.createNativeQuery(query + " LIMIT 10");
+        List<Object[]> data =  nativeQuery.getResultList();
+        String jsonString = objectMapper.writeValueAsString(data);
+        return  jsonString;
     }
 }
