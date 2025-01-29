@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 public class ProcessInstance {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "processId")
     public Long processId;
 

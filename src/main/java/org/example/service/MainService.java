@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.constant.Status;
 import org.example.dto.QueryBuilderDTO;
 import org.example.dto.RulesDTO;
+import org.example.dto.TaskDTO;
+import org.example.dto.TaskDetailsDTO;
 import org.example.entity.ProcessInstance;
 import org.example.entity.RuleData;
 import org.example.entity.Rules;
@@ -87,7 +89,8 @@ public class MainService {
             for(int i=0;i<tasksList.size();i++){
                 Tasks tasks= tasksList.get(i);
                 tasks.setProcess(processInstance);
-                tasksRepository.save(tasks);
+                tasks = tasksRepository.save(tasks);
+                System.out.println(tasks);
             }
         }
         return rules.getRuleId();
@@ -119,7 +122,58 @@ public class MainService {
         queryBuilderDTO.setTableName(ruleData.getTableName());
         queryBuilderDTO.setRuleId(ruleId);
         queryBuilderDTO.setRuleDataId(ruleData.getId());
+        queryBuilderDTO.setStatus(rules.getStatus());
         queryBuilderDTO.setState(Status.values()[rules.getStatus()].toString());
         return queryBuilderDTO;
+    }
+
+    public List<TaskDTO> getTaskList() {
+        return tasksRepository.findAll().stream()
+                .map(this::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+    private TaskDTO mapEntityToDto(Tasks entity) {
+        TaskDTO dto = new TaskDTO();
+        dto.setTaskId(entity.getTaskId());
+        dto.setStatus(entity.getStatus());
+        dto.setCreatedDate(entity.getUpdatedDate());
+        dto.setOwner(entity.getOwner());
+        dto.setRuleName(entity.getProcess().getRule().getRuleName());
+        return dto;
+    }
+
+    public TaskDetailsDTO getTaskDetails(Long taskId) {
+        Tasks task = tasksRepository.findById(taskId).get();
+        TaskDetailsDTO taskDetailsDTO = new TaskDetailsDTO();
+        taskDetailsDTO.setRole(task.getRole());
+        taskDetailsDTO.setTaskId(taskId);
+        taskDetailsDTO.setRuleName(task.getProcess().getRule().getRuleName());
+        taskDetailsDTO.setStatus(task.getStatus());
+        RuleData ruleData = ruleDataRepository.findByRule(task.getProcess().getRule());
+        taskDetailsDTO.setQuery(ruleData.getSqlQuery());
+        return taskDetailsDTO;
+    }
+
+    public Long updateTask(TaskDetailsDTO taskDetailsDTO) {
+            kieService.startTask("ReviewProcess_1.0.0-SNAPSHOT",taskDetailsDTO.getTaskId(),"wbadmin");
+            kieService.completeTask("ReviewProcess_1.0.0-SNAPSHOT",taskDetailsDTO.getTaskId(),"wbadmin",taskDetailsDTO.getStatus());
+            Tasks tasks = tasksRepository.findById(taskDetailsDTO.getTaskId()).get();
+            tasks.setStatus("Completed");
+            tasksRepository.save(tasks);
+            if(taskDetailsDTO.getStatus().equals("Accept")){
+                Rules rules = tasks.getProcess().getRule();
+                rules.setStatus(3);
+                rulesRepository.save(rules);
+            }
+            else{
+                ProcessInstance processInstance = tasks.getProcess();
+                List<Tasks> tasksList = kieService.getTasks(processInstance.getProcessId(),"ReviewProcess_1.0.0-SNAPSHOT");
+                for(int i=0;i<tasksList.size();i++){
+                    Tasks task= tasksList.get(i);
+                    task.setProcess(processInstance);
+                    tasksRepository.save(task);
+                }
+            }
+            return taskDetailsDTO.getTaskId();
     }
 }

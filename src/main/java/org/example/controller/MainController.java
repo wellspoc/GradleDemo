@@ -2,6 +2,8 @@ package org.example.controller;
 
 import org.example.dto.QueryBuilderDTO;
 import org.example.dto.RulesDTO;
+import org.example.dto.TaskDTO;
+import org.example.dto.TaskDetailsDTO;
 import org.example.entity.Tasks;
 import org.example.service.KieService;
 import org.example.service.MainService;
@@ -84,6 +86,36 @@ public class MainController {
 
         return ResponseEntity.ok(rule);
     }
+
+    @GetMapping("/tasks")
+    public ResponseEntity<List<TaskDTO>> getTaskList() {
+        List<TaskDTO> rules = mainService.getTaskList();
+        return ResponseEntity.ok(rules);
+    }
+
+    @GetMapping("/tasks/{taskId}")
+    public ResponseEntity<TaskDetailsDTO> getTask(@PathVariable Long taskId) {
+        if (taskId == null || taskId <= 0) {
+            return ResponseEntity.badRequest().body(null);  // Validate ID
+        }
+
+        TaskDetailsDTO taskDetails = mainService.getTaskDetails(taskId);
+        if (taskDetails == null) {
+            return ResponseEntity.notFound().build();  // Return 404 if rule is not found
+        }
+
+        return ResponseEntity.ok(taskDetails);
+    }
+    @PostMapping("/tasks")
+    public ResponseEntity<Long> updateTask(@RequestBody TaskDetailsDTO taskDetailsDTO) {
+        if (taskDetailsDTO == null) {
+            return ResponseEntity.badRequest().body(null);  // Input validation
+        }
+
+        Long taskId = mainService.updateTask(taskDetailsDTO);
+        return ResponseEntity.ok(taskId);
+    }
+
     private static final String KIE_SERVER_URL = "https://jbpm-53jhowy2kq-uc.a.run.app/kie-server/services/rest/server";
     private static final String KIE_SERVER_USER = "wbadmin";
     private static final String KIE_SERVER_PASSWORD = "wbadmin";

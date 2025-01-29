@@ -3,6 +3,7 @@ package org.example.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.example.entity.Tasks;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,6 +57,7 @@ public class KieService {
         List<Tasks> tasksList= new ArrayList<>();
         KieServicesClient kieServicesClient = createKieServicesClient();
         UserTaskServicesClient taskClient = kieServicesClient.getServicesClient(UserTaskServicesClient.class);
+
         List<String> statuses = Arrays.asList("Ready", "Reserved", "InProgress");
         List<TaskSummary> taskSummaryList= taskClient.findTasksByStatusByProcessInstanceId(datapid, statuses, 0,10);
 
@@ -66,6 +69,9 @@ public class KieService {
                 tasks.setCreator(t.getCreatedBy());
                 tasks.setOwner(t.getActualOwner());
                 tasks.setStatus(t.getStatus());
+                tasks.setRole(t.getName());
+                tasks.setCreatedDate(LocalDateTime.now());
+                tasks.setUpdatedDate(LocalDateTime.now());
                 tasksList.add(tasks);
             }
 
@@ -75,14 +81,20 @@ public class KieService {
     public String startTask(String container, Long taskId,String userId){
         KieServicesClient kieServicesClient = createKieServicesClient();
         UserTaskServicesClient taskClient = kieServicesClient.getServicesClient(UserTaskServicesClient.class);
+        taskClient.releaseTask(container,taskId,userId);
         taskClient.startTask(container,taskId,userId);
        return "started";
     }
-    public String completeTask(String container, Long taskId,String userId)
+    public String completeTask(String container, Long taskId,String userId, String response)
     {
         KieServicesClient kieServicesClient = createKieServicesClient();
         UserTaskServicesClient taskClient = kieServicesClient.getServicesClient(UserTaskServicesClient.class);
-        Map<String, Object> params = Collections.emptyMap();
+        Map<String, Object> params = new HashMap<>();
+        params.put("Accept", "false");
+        params.put("Reject", "false");
+        params.put("Rewrite", "false");
+        params.put("initiator", userId);
+        params.put(response,"true");
         taskClient.completeTask(container, taskId, userId, params);
         return "completed";
     }

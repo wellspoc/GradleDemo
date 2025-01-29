@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 public class Tasks {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "taskId")
     public Long taskId;
 
@@ -28,6 +27,17 @@ public class Tasks {
 
     @Column(name = "status")
     public String status;
+
+    @Column(name = "role")
+    public String role;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     @ManyToOne
     @JoinColumn(name = "processId", referencedColumnName = "processId")
