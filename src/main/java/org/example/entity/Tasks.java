@@ -11,8 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "task")
 public class Tasks {
@@ -23,13 +21,13 @@ public class Tasks {
     public Long taskId;
 
     @Column(name = "owner")
-    public Integer owner;
+    public String owner;
 
     @Column(name = "creator")
-    public Integer creator;
+    public String creator;
 
     @Column(name = "status")
-    public Integer status;
+    public String status;
 
     @ManyToOne
     @JoinColumn(name = "processId", referencedColumnName = "processId")
@@ -40,4 +38,60 @@ public class Tasks {
 
     @Column(name = "UpdatedDate")
     public LocalDateTime updatedDate;
+
+    public Long getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public ProcessInstance getProcess() {
+        return process;
+    }
+
+    public void setProcess(ProcessInstance process) {
+        this.process = process;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(LocalDateTime updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }

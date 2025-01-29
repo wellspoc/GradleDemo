@@ -16,8 +16,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "process_instance")
-@Getter
-@Setter
 public class ProcessInstance {
 
     @Id
@@ -37,4 +35,44 @@ public class ProcessInstance {
 
     @Column(name = "UpdatedDate")
     public LocalDateTime updatedDate;
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Long getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(Long processId) {
+        this.processId = processId;
+    }
+
+    public Rules getRule() {
+        return rule;
+    }
+
+    public void setRule(Rules rule) {
+        this.rule = rule;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(LocalDateTime updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }
