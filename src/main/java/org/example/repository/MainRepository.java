@@ -14,7 +14,13 @@ public interface MainRepository extends JpaRepository<Users, Long> {
     @Query(nativeQuery = true, value = "SELECT table_name FROM information_schema.tables WHERE table_schema = :schema")
     List<String> getTableList(@Param("schema") String tableSchema);
 
-    @Query(nativeQuery = true, value = "SELECT table_name, column_name FROM information_schema.columns WHERE table_name IN (:tableName) AND table_schema = :schema")
+    @Query(nativeQuery = true, value = "SELECT table_name, column_name,CASE " +
+            "        WHEN data_type IN ('bigint', 'integer') THEN 'number' " +
+            "        WHEN data_type = 'boolean' THEN 'boolean' " +
+            "        WHEN data_type = 'timestamp without time zone' THEN 'date' " +
+            "        WHEN data_type = 'character varying' THEN 'string' " +
+            "        ELSE data_type " +
+            "    END AS data_type FROM information_schema.columns WHERE table_name IN (:tableName) AND table_schema = :schema")
     List<Object[]> getTableColumns(@Param("tableName") String[] tableName, @Param("schema") String tableSchema);
 
     @Query(value = ":query LIMIT 10",

@@ -45,6 +45,7 @@ public class KieService {
         params.put("Accept", "false");
         params.put("Reject", "false");
         params.put("Rewrite", "true");
+        params.put("employee", "Hardik");
         params.put("initiator", "wbadmin");
         return processClient.startProcess(container, id, params);
     }

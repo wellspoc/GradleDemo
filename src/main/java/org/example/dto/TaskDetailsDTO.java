@@ -6,6 +6,15 @@ public class TaskDetailsDTO {
     String role;
     Long taskId;
     String status;
+    Long ruleId;
+
+    public Long getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(Long ruleId) {
+        this.ruleId = ruleId;
+    }
 
     public String getStatus() {
         return status;

@@ -19,7 +19,7 @@ dependencies {
     implementation 'org.projectlombok:lombok'
     implementation group: 'org.kie.server', name: 'kie-server-client', version: '7.74.1.Final'
     implementation 'org.modelmapper:modelmapper:2.1.1'
-
+    implementation 'org.json:json:20210307'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.mysql:mysql-connector-j'
 }

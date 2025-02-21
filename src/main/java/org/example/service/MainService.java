@@ -21,6 +21,7 @@ import org.example.repository.TasksRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -28,6 +29,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,9 +61,15 @@ public class MainService {
         return mainRepository.getTableList(tableSchema);
     }
 
-    public List<String> getTableColumn(String[] tableName) {
-        return mainRepository.getTableColumns(tableName,tableSchema).stream()
-                .map(row -> row[0] + "." + row[1])
+    public List<Map<String, String>> getTableColumn(String[] tableName) {
+        return mainRepository.getTableColumns(tableName, tableSchema).stream()
+                .map(row -> {
+                    Map<String, String> columnData = Map.of(
+                            "columnName", row[0] + "." + row[1],
+                            "dataType", row[2].toString()
+                    );
+                    return columnData;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -85,7 +93,7 @@ public class MainService {
             if(processInstance!=null){
                 processInstanceRepository.delete(processInstance);
             }
-            Long instanceId = kieService.invokeProcess("ReviewProcess.review","ReviewProcess_1.0.0-SNAPSHOT");
+            Long instanceId = kieService.invokeProcess("ReviewProcess.Review","ReviewProcess_1.0.0-SNAPSHOT");
             processInstance = new ProcessInstance();
             processInstance.setRule(rules);
             processInstance.setProcessId(instanceId);
@@ -98,14 +106,13 @@ public class MainService {
                 Tasks tasks= tasksList.get(i);
                 tasks.setProcess(processInstance);
                 tasks = tasksRepository.save(tasks);
-                System.out.println(tasks);
             }
         }
         return rules.getRuleId();
     }
 
     public List<RulesDTO> getRuleList() {
-        return rulesRepository.findAll().stream()
+        return rulesRepository.findAll(Sort.by(Sort.Direction.DESC,"ruleId")).stream()
                 .map(this::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -129,6 +136,7 @@ public class MainService {
         queryBuilderDTO.setSqlQuery(ruleData.getSqlQuery());
         queryBuilderDTO.setTableName(ruleData.getTableName());
         queryBuilderDTO.setRuleId(ruleId);
+        queryBuilderDTO.setWhereClause(ruleData.getWhereClause());
         queryBuilderDTO.setRuleDataId(ruleData.getId());
         queryBuilderDTO.setStatus(rules.getStatus());
         queryBuilderDTO.setState(Status.values()[rules.getStatus()].toString());
@@ -136,7 +144,7 @@ public class MainService {
     }
 
     public List<TaskDTO> getTaskList() {
-        return tasksRepository.findAll().stream()
+        return tasksRepository.findAll(Sort.by(Sort.Direction.DESC,"createdDate")).stream()
                 .map(this::mapEntityToDto)
                 .collect(Collectors.toList());
     }
@@ -157,6 +165,7 @@ public class MainService {
         taskDetailsDTO.setTaskId(taskId);
         taskDetailsDTO.setRuleName(task.getProcess().getRule().getRuleName());
         taskDetailsDTO.setStatus(task.getStatus());
+        taskDetailsDTO.setRuleId(task.getProcess().getRule().getRuleId());
         RuleData ruleData = ruleDataRepository.findByRule(task.getProcess().getRule());
         taskDetailsDTO.setQuery(ruleData.getSqlQuery());
         return taskDetailsDTO;
